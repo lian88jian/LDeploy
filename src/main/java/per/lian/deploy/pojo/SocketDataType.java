@@ -24,4 +24,13 @@ public interface SocketDataType {
 	 */
 	public static final int SERVER_FILE = 201;
 	
+	/**
+	 * 服务器发送关闭指令
+	 */
+	public static final int SERVER_SHUTDOWN = 202;
+	
+	/**
+	 * 一键部署
+	 */
+	public static final int SERVER_ONEKEY_DEPLOY = 203;
 }

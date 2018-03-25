@@ -33,6 +33,7 @@ public class ClientThread extends Thread implements SocketDataType {
 	private String lastHeartBeatTime = null;
 	
 	private String clientName;
+	private ClientInfo clientInfo;
 
 
 	public ClientThread(SocketServer socketServer, Socket socket) throws Exception {
@@ -54,6 +55,23 @@ public class ClientThread extends Thread implements SocketDataType {
 	public void sendFile(File file, String path) throws Exception {
 		
 		this.out.writeObject(SocketData.SERVER_FILE(file, path));
+	}
+	
+
+	public void sendShutdown() throws Exception {
+		
+		this.out.writeObject(SocketData.SERVER_SHUTDOWN());
+	}
+	
+	/**
+	 * 一键部署
+	 * @param type 
+	 * @throws Exception
+	 */
+	public void oneKeyDeploy(String version) throws Exception{
+		
+		ServerFileManager.generaterMd5File(clientInfo.getType(), version);
+		this.out.writeObject(new SocketData(SERVER_ONEKEY_DEPLOY));
 	}
 	
 	@Override
@@ -79,11 +97,12 @@ public class ClientThread extends Thread implements SocketDataType {
 		}
 	}
 
-	private void _handle(SocketData socketObj) {
+	private void _handle(SocketData socketObj) throws Exception {
 		
 		switch(socketObj.getType()){
 		case CLIENT_INFO:
 			System.out.println("client info:" + socketObj.getStringData());
+			socketServer.add(this, socketObj.getStringData());
 			break;
 		case CLIENT_CMD_MSG:
 			System.out.println("client cmd msg:" + socketObj.getStringData());
@@ -110,6 +129,10 @@ public class ClientThread extends Thread implements SocketDataType {
 
 	public String getClientName() {
 		return clientName;
+	}
+
+	public void setClientInfo(ClientInfo clientInfo) {
+		this.clientInfo = clientInfo;
 	}
 	
 }

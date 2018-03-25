@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson.JSONObject;
 
+import per.lian.deploy.client.SocketClient;
 import per.lian.utils.DateUtil;
 import per.lian.utils.FileUtil;
 
@@ -25,6 +28,22 @@ public class SocketData implements SocketDataType, Serializable {
 		
 		setType(type);
 		setData(data);
+	}
+	
+	public SocketData(int type, String...msg) {
+		
+		setType(type);
+		if(msg == null) return ;
+		switch(msg.length){
+		case 4:
+			setMsg_4(msg[3]);
+		case 3:
+			setMsg_3(msg[2]);
+		case 2:
+			setMsg_2(msg[1]);
+		case 1:
+			setMsg_1(msg[0]);
+		}
 	}
 	
 	public String getStringData(){
@@ -71,8 +90,13 @@ public class SocketData implements SocketDataType, Serializable {
 	public static SocketData CLIENT_INFO() {
 		
 		JSONObject clientInfo = new JSONObject();
+		clientInfo.put("clientName", SocketClient.ClientName);
 		clientInfo.put("osname", System.getProperty("os.name"));
 		return new SocketData(CLIENT_INFO, getByte(clientInfo.toJSONString()));
+	}
+	
+	public static SocketData SERVER_SHUTDOWN() {
+		return new SocketData(SERVER_SHUTDOWN, StringUtils.EMPTY);
 	}
 
 	public int getType() {

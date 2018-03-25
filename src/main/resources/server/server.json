@@ -1,9 +1,11 @@
 {
-	"port":8888,
-	"clients": {
-		"WasDubbo_131": {
+	"port":9999,
+	"work_dir":"F:\\temps\\server",
+	"clients":[
+		{
+			"name": "WasDubbo_131",
 			"ip": "127.0.0.1",
 			"type": "was-dubbo"
 		}
-	}
+	]
 }

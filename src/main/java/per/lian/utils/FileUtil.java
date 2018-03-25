@@ -173,7 +173,7 @@ public class FileUtil {
 	 * 
 	 * @return
 	 */
-	public static List<File> getFileByExt(File dir, String ext) {
+	public static List<File> getFilesByExt(File dir, String ext) {
 		List<File> list = new ArrayList<File>();
 		List<File> list_bk = new ArrayList<File>();
 		popAllFile(list, dir);
@@ -181,7 +181,7 @@ public class FileUtil {
 			int dot = temp.getName().lastIndexOf('.') + 1;
 			String _ext = temp.getName().substring(dot);
 
-			if (ext.equals(_ext))
+			if (ext == null || ext.equals(_ext))
 				list_bk.add(temp);
 		}
 		return list_bk;
@@ -248,4 +248,6 @@ public class FileUtil {
             }
         }
     }
+    
+    
 }

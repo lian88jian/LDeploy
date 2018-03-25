@@ -62,6 +62,13 @@ public class ClientReadThread extends Thread implements SocketDataType {
 		case SERVER_FILE:
 			FileUtil.createFileWithBytes("F:\\temps\\tmp\\" + socketData.getMsg_2(), socketData.getMsg_1(), socketData.getData());
 			break;
+		case SERVER_SHUTDOWN:
+			System.err.println("服务端要求关闭程序");
+			SocketClient.getInstance().shutdown();
+			break;
+		case SERVER_ONEKEY_DEPLOY:
+			
+			break;
 		}
 	}
 }
