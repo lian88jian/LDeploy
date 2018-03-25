@@ -19,13 +19,19 @@ public class SocketClient {
 	private CommandThread commandThread;
 	private ClientReadThread socketReadThread;
 	
+	private String clientName;
+	private String workDir;
+	
 	/**
 	 * 
 	 * @param ip 服务器ip
 	 * @param port 服务器端口
 	 * @throws Exception
 	 */
-	public SocketClient(String ip, int port) {
+	public SocketClient(String ip, int port, String clientName, String workDir) {
+		
+		this.clientName = clientName;
+		this.workDir = workDir;
 		
 		this.destnation = new InetSocketAddress(ip, port);
 		
@@ -71,9 +77,17 @@ public class SocketClient {
 		}
 		System.out.println("connect server success");
 	}
-
+	/**
+	 * 127.0.0.1 
+	 * 8888 
+	 * WasDubbo_131 
+	 * C:/Users/goalsword/git/LDeploy/target/classes/
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 		
-		new SocketClient("127.0.0.1", 8888);
+		String workDir = Class.class.getClass().getResource("/").getPath();
+		new SocketClient(args[0], Integer.parseInt(args[1]), args[2], workDir);
 	}
 }

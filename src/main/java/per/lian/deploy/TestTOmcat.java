@@ -21,10 +21,10 @@ public class TestTOmcat {
 		
 		Thread.sleep(15000);
 		
-		long pid = ProcessUtil.getPid(process);
-		System.out.println(pid);
-		System.out.println(process.isAlive());
-		System.out.println(process.exitValue());
-		process.destroy();
+//		long pid = ProcessUtil.getPid(process);
+//		System.out.println(pid);
+//		System.out.println(process.isAlive());
+//		System.out.println(process.exitValue());
+//		process.destroy();
 	}
 }

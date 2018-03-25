@@ -1,5 +1,7 @@
 package per.lian.deploy.server;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -47,6 +49,11 @@ public class ClientThread extends Thread implements SocketDataType {
 	public void execute(String cmd) throws Exception {
 		
 		this.out.writeObject(SocketData.SERVER_CMD(cmd));
+	}
+	
+	public void sendFile(File file, String path) throws Exception {
+		
+		this.out.writeObject(SocketData.SERVER_FILE(file, path));
 	}
 	
 	@Override
@@ -104,4 +111,5 @@ public class ClientThread extends Thread implements SocketDataType {
 	public String getClientName() {
 		return clientName;
 	}
+	
 }

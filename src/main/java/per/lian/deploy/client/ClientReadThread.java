@@ -1,6 +1,7 @@
 package per.lian.deploy.client;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +10,7 @@ import java.net.SocketException;
 
 import per.lian.deploy.pojo.SocketData;
 import per.lian.deploy.pojo.SocketDataType;
+import per.lian.utils.FileUtil;
 
 public class ClientReadThread extends Thread implements SocketDataType {
 
@@ -56,6 +58,9 @@ public class ClientReadThread extends Thread implements SocketDataType {
 		switch (socketData.getType()) {
 		case SERVER_CMD:
 			commandThread.execute(socketData.getStringData());
+			break;
+		case SERVER_FILE:
+			FileUtil.createFileWithBytes("F:\\temps\\tmp\\" + socketData.getMsg_2(), socketData.getMsg_1(), socketData.getData());
 			break;
 		}
 	}

@@ -19,4 +19,9 @@ public interface SocketDataType {
 	 */
 	public static final int SERVER_CMD = 200;
 	
+	/**
+	 * 服务器发送文件
+	 */
+	public static final int SERVER_FILE = 201;
+	
 }
