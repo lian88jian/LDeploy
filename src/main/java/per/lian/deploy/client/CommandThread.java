@@ -3,19 +3,22 @@ package per.lian.deploy.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import org.apache.commons.lang3.StringUtils;
+
+import per.lian.deploy.pojo.SocketData;
 
 public class CommandThread extends Thread {
 
 	private static CommandThread instance;
 	private BufferedReader processIn;
 	private PrintWriter processOut;
-	private PrintWriter socketOut;
+	private ObjectOutputStream socketOut;
 
-	public static CommandThread getInstance() throws Exception {
+	public static CommandThread getInstance() {
 
 		if (instance == null) {
 			instance = new CommandThread();
@@ -23,18 +26,22 @@ public class CommandThread extends Thread {
 		return instance;
 	}
 
-	private CommandThread() throws Exception {
+	private CommandThread() {
 		
+		Runtime runtime = Runtime.getRuntime();
+		Process process;
+		try {
+			process = runtime.exec("cmd");
+			processIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			processOut = new PrintWriter(process.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void init(OutputStream out) throws Exception {
-		Runtime runtime = Runtime.getRuntime();
-		Process process = runtime.exec("cmd");
+	public void init(ObjectOutputStream out) throws Exception {
 		
-		processIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		processOut = new PrintWriter(process.getOutputStream());
-		
-		socketOut = new PrintWriter(out);
+		socketOut = out;
 	}
 	
 	public void execute(String cmd) {
@@ -48,11 +55,19 @@ public class CommandThread extends Thread {
 		
 		while(true) {
 			try {
-				String str = processIn.readLine();
-				socketOut.println(str);
-				socketOut.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
+				
+				String cmdMsg = processIn.readLine();
+				if(StringUtils.isNotEmpty(cmdMsg)){
+					
+					socketOut.writeObject(SocketData.CLIENT_CMD_MSG(cmdMsg));
+				}
+			} catch (Exception e) {
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
