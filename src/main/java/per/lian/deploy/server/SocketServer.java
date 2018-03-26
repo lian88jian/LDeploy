@@ -81,7 +81,6 @@ public class SocketServer {
 		
 		WorkDir = confJson.getString("work_dir");
 		
-		ServerFileManager.generaterMd5File("was-dubbo", "20180324");
 		new SocketServer(confJson.getIntValue("port"), confJson.getJSONArray("clients")).start(); // 启动
 	}
 

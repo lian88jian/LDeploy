@@ -116,6 +116,9 @@ public class ClientThread extends Thread implements SocketDataType {
 			System.out.println("client heart beat:" + DateUtil.getDateYMDHMS());
 			this.lastHeartBeatTime = DateUtil.getDateYMDHMS();
 			break;
+		case CLIENT_REQUIRE_MD5:
+			System.out.println("client require md5 file");
+			this.sendFile(file, path);
 		}
 	}
 
