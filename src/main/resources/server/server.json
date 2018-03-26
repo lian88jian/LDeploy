@@ -1,6 +1,6 @@
 {
 	"port":9999,
-	"work_dir":"F:\\temps\\server",
+	"work_dir":"E:\\temp\\temps\\server",
 	"clients":[
 		{
 			"name": "WasDubbo_131",

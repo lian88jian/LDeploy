@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.springframework.util.DigestUtils;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import per.lian.utils.FileUtil;
 
 public class ServerFileManager {
@@ -21,13 +24,16 @@ public class ServerFileManager {
 			return;
 		}
 		
-		StringBuffer buff = new StringBuffer();
+		JSONArray arr = new JSONArray();
 		List<File> fileList = FileUtil.getFilesByExt(new File(serverDirPath), null);
 		for (File _file : fileList) {
 			
 			String _md5 = DigestUtils.md5DigestAsHex(new FileInputStream(_file));
-			buff.append(_file.getAbsolutePath().replace(serverDirPath, "") + ":" + _md5 + "\r\n");
+			JSONObject _md5Json = new JSONObject();
+			_md5Json.put("file", _file.getAbsolutePath().replace(serverDirPath, ""));
+			_md5Json.put("md5", _md5);
+			arr.add(_md5Json);
 		}
-		FileUtil.createFileWithBytes(serverDirPath + "md5.txt", buff.toString().getBytes());
+		FileUtil.createFileWithBytes(serverDirPath + "md5.txt", arr.toJSONString().getBytes("utf-8"));
 	}
 }

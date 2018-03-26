@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.SocketException;
 
 import per.lian.deploy.pojo.SocketData;
@@ -17,6 +18,7 @@ public class ClientReadThread extends Thread implements SocketDataType {
 	private static ClientReadThread instance;
 	private ObjectInputStream socketIn;
 	private CommandThread commandThread;
+	private ObjectOutputStream out;
 
 	public static ClientReadThread getInstance() {
 		if (instance == null) {
@@ -30,8 +32,9 @@ public class ClientReadThread extends Thread implements SocketDataType {
 		commandThread = CommandThread.getInstance();
 	}
 
-	public void init(InputStream in) throws Exception {
+	public void init(ObjectOutputStream out, InputStream in) throws Exception {
 		this.socketIn = new ObjectInputStream(in);
+		this.out = out;
 	}
 
 	@Override
@@ -52,8 +55,13 @@ public class ClientReadThread extends Thread implements SocketDataType {
 			}
 		}
 	}
+	
 
-	private void _handleServerData(SocketData socketData) {
+	public void sendSocketData(SocketData socketData) throws Exception {
+		out.writeObject(socketData);
+	}
+
+	private void _handleServerData(SocketData socketData) throws Exception {
 
 		switch (socketData.getType()) {
 		case SERVER_CMD:
@@ -67,7 +75,12 @@ public class ClientReadThread extends Thread implements SocketDataType {
 			SocketClient.getInstance().shutdown();
 			break;
 		case SERVER_ONEKEY_DEPLOY:
-			
+			String clientType = socketData.getMsg_1();
+			if(!SocketClient.ClientType.equals(clientType)) {
+				out.writeObject(new SocketData(CLIENT_ERROR, "服务端与客户端类型不一致"));
+			}
+			String clientVersion = socketData.getMsg_2();
+			ClientFileManager.checkProjectFiles(FLOW_ONE_KEY_DEPLOY, clientVersion);
 			break;
 		}
 	}

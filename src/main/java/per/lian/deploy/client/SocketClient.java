@@ -23,6 +23,7 @@ public class SocketClient {
 	private ClientReadThread socketReadThread;
 
 	public static String ClientName;
+	public static String ClientType;
 	public static String WorkDir;
 	
 	private static SocketClient instance = new SocketClient();
@@ -74,7 +75,7 @@ public class SocketClient {
 			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 			heartBeatThread.init(out);
 			commandThread.init(out);
-			socketReadThread.init(socket.getInputStream());
+			socketReadThread.init(out, socket.getInputStream());
 
 			out.writeObject(SocketData.CLIENT_INFO());
 		} catch (Exception e) {
@@ -114,6 +115,7 @@ public class SocketClient {
 		SocketClient.getInstance().init(confJson.getString("server_id"), confJson.getIntValue("server_port"));;
 		
 		ClientName = confJson.getString("client_name");
+		ClientType = confJson.getString("client_type");
 		WorkDir = confJson.getString("work_dir");
 	}
 }

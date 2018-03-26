@@ -71,7 +71,7 @@ public class ClientThread extends Thread implements SocketDataType {
 	public void oneKeyDeploy(String version) throws Exception{
 		
 		ServerFileManager.generaterMd5File(clientInfo.getType(), version);
-		this.out.writeObject(new SocketData(SERVER_ONEKEY_DEPLOY));
+		this.out.writeObject(new SocketData(SERVER_ONEKEY_DEPLOY, clientInfo.getType(), version));
 	}
 	
 	@Override
