@@ -1,42 +1,34 @@
 package per.lian.deploy.client;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.sun.jna.Platform;
+
 import per.lian.deploy.pojo.SocketData;
 
-public class CommandThread extends Thread {
+public class ProcessThread extends Thread {
 
-	private static CommandThread instance;
+	private static ProcessThread instance;
 	private BufferedReader processIn;
 	private PrintWriter processOut;
 	private ObjectOutputStream socketOut;
 
-	public static CommandThread getInstance() {
+	public static ProcessThread getInstance() {
 
 		if (instance == null) {
-			instance = new CommandThread();
+			instance = new ProcessThread();
 		}
 		return instance;
 	}
 
-	private CommandThread() {
+	private ProcessThread() {
 		
-		Runtime runtime = Runtime.getRuntime();
-		Process process;
-		try {
-			process = runtime.exec("cmd");
-			processIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			processOut = new PrintWriter(process.getOutputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public void init(ObjectOutputStream out) throws Exception {
@@ -44,10 +36,19 @@ public class CommandThread extends Thread {
 		socketOut = out;
 	}
 	
-	public void execute(String cmd) {
+	public void startProcess() throws Exception {
+		ProcessBuilder pb = new ProcessBuilder();
+		Map<String, String> env = pb.environment();
+		env.putAll(SocketClient.envMap);
+		if(Platform.isWindows()) {
+			pb.command(SocketClient.startWindows);
+		} else {
+			pb.command(SocketClient.startLinux);
+		}
+		Process process = pb.start();
 		
-		processOut.println(cmd);
-		processOut.flush();
+		processIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		processOut = new PrintWriter(process.getOutputStream());
 	}
 	
 	@Override

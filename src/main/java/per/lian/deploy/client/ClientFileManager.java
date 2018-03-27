@@ -2,21 +2,16 @@ package per.lian.deploy.client;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.springframework.util.DigestUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import per.lian.deploy.pojo.SocketData;
-import per.lian.deploy.pojo.SocketDataType;
+import per.lian.deploy.pojo.SocketConstants;
 import per.lian.utils.FileUtil;
 
-public class ClientFileManager implements SocketDataType {
+public class ClientFileManager implements SocketConstants {
 	
 	/**
 	 * 校验项目文件, 如果没有md5文件, 则先去请求
@@ -25,7 +20,7 @@ public class ClientFileManager implements SocketDataType {
 	 * @return
 	 * @throws Exception
 	 */
-	public static boolean checkProjectFiles(String flowName, String clientVersion) throws Exception{
+	public static void checkProjectFiles(String flowName, String clientVersion) throws Exception{
 		
 		//版本目录 E:\temp\temps\client\20180326
 		String versionDirPath = SocketClient.WorkDir + "/" + clientVersion;
@@ -38,17 +33,22 @@ public class ClientFileManager implements SocketDataType {
 			versionDir.mkdirs();
 			System.out.println("prject version dir create success :" + versionDirPath);
 		}
-		
+		//如果md5文件不存在, 先请求md5文件
 		if(!md5File.exists()) {
 			
 			//请求服务器md5文件, 第二个字段, 指定当前所做的流程
 			//一键部署(FLOW_ONE_KEY_DEPLOY)
 			SocketData socketData = new SocketData(CLIENT_REQUIRE_MD5, flowName, clientVersion);
 			ClientReadThread.getInstance().sendSocketData(socketData);
-			return false;
+			
 		}
 		
-		return validWithMd5File(flowName, clientVersion);
+		//如果是一键部署, 下一步校验文件列表
+		if(FLOW_ONE_KEY_DEPLOY.equals(flowName)) {
+			
+			SocketData socketData = new SocketData(CLIENT_NEXT_STEP, flowName, clientVersion, STEP_VALID_WITH_MD5_FILE);
+			ClientReadThread.getInstance().sendSocketData(socketData);
+		}
 	}
 	
 	/**

@@ -1,7 +1,14 @@
 {
 	"server_id":"127.0.0.1",
 	"server_port":8888,
-	"client_name:"WasDubbo_131",
-	"work_dir":"E:\temp\temps\client",
-	"client_type":"was-dubbo"
+	"client_name":"WasDubbo_131",
+	"work_dir":"E:/temp/temps/client",
+	"client_type":"was-dubbo",
+	"pid_port":8080,
+	"start_linux": "java -jar was-dubbo-provider-1.0.0.jar",
+	"start_windows": "java -jar was-dubbo-provider-1.0.0.jar",
+	"env":{
+		"WAS":"Dev",
+		"JAVA_OPTS":"-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8"
+	}
 }

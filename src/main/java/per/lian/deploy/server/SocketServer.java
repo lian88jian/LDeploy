@@ -14,7 +14,10 @@ import com.alibaba.fastjson.JSONObject;
 import per.lian.utils.FileUtil;
 
 public class SocketServer {
-
+	
+	/**
+	 * 客户端map
+	 */
 	private Map<String, ClientInfo> clientMap = new ConcurrentHashMap<String, ClientInfo>();
 	private final int port;
 	
@@ -35,27 +38,29 @@ public class SocketServer {
 	 */
 	public void add(ClientThread clientThread, String clientJsonInfo) throws Exception{
 		
-		String clientName = clientThread.getClientName();
-		if(!clientMap.containsKey(clientName)) {
+		JSONObject json = JSONObject.parseObject(clientJsonInfo);
+		String remoteName = json.getString("clientName");
+		String remoteOs = json.getString("osName");
+		
+		if(!clientMap.containsKey(remoteName)) {
 			//不包含, 直接关闭
 			clientThread.sendShutdown();
 			return ;
 		}
 		//可能是断线重连, 废弃以前的
-		ClientInfo clientInfo = clientMap.get(clientName);
+		ClientInfo clientInfo = clientMap.get(remoteName);
 		ClientThread abondonClient = clientInfo.getClientThread();
-		if(clientThread != null){
+		if(abondonClient != null){
 			abondonClient.destroy();
 		}
 		
 		clientInfo.setClientThread(clientThread);
 		
-		JSONObject json = JSONObject.parseObject(clientJsonInfo);
 		
-		clientInfo.setOs(json.getString("os"));
+		clientInfo.setOs(remoteOs);
 		clientThread.setClientInfo(clientInfo);
 		
-		System.out.printf("client [%s] connected, os:%s", clientName, clientInfo.getOs());
+		System.out.printf("client [%s] connected, os:%s, ip:%s", remoteName, clientInfo.getOs(), clientThread.getIp());
 	}
 	
 	@SuppressWarnings("resource")

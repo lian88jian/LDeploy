@@ -12,7 +12,7 @@ import per.lian.deploy.client.SocketClient;
 import per.lian.utils.DateUtil;
 import per.lian.utils.FileUtil;
 
-public class SocketData implements SocketDataType, Serializable {
+public class SocketData implements SocketConstants, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private static final String CHARSET = "utf-8";
@@ -59,11 +59,12 @@ public class SocketData implements SocketDataType, Serializable {
 		return new SocketData(CLIENT_CMD_HEART, getByte(DateUtil.getDateYMDHMS()));
 	}
 	
-	public static SocketData SERVER_FILE(File file, String path) {
+	public static SocketData SERVER_FILE(File file, String flowName, String version) {
 		
 		SocketData socketData = new SocketData(SERVER_FILE, FileUtil.getBytes(file));
-		socketData.setMsg_1(file.getName());
-		socketData.setMsg_2(path);
+		socketData.setMsg_1(flowName);
+		socketData.setMsg_2(version);
+		socketData.setMsg_3(file.getName());
 		return socketData;
 	}
 
@@ -91,7 +92,7 @@ public class SocketData implements SocketDataType, Serializable {
 		
 		JSONObject clientInfo = new JSONObject();
 		clientInfo.put("clientName", SocketClient.ClientName);
-		clientInfo.put("osname", System.getProperty("os.name"));
+		clientInfo.put("osName", System.getProperty("os.name"));
 		return new SocketData(CLIENT_INFO, getByte(clientInfo.toJSONString()));
 	}
 	

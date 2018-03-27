@@ -8,8 +8,10 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.commons.lang3.text.WordUtils;
+
+import per.lian.deploy.pojo.SocketConstants;
 import per.lian.deploy.pojo.SocketData;
-import per.lian.deploy.pojo.SocketDataType;
 import per.lian.utils.DateUtil;
 import per.lian.utils.IOUtil;
 
@@ -18,7 +20,7 @@ import per.lian.utils.IOUtil;
  * @author goalsword
  *
  */
-public class ClientThread extends Thread implements SocketDataType {
+public class ClientThread extends Thread implements SocketConstants {
 	
 	private final static int MSG_LIMIT = 3000;
 	
@@ -32,7 +34,6 @@ public class ClientThread extends Thread implements SocketDataType {
 	private String ip;
 	private String lastHeartBeatTime = null;
 	
-	private String clientName;
 	private ClientInfo clientInfo;
 
 
@@ -44,7 +45,7 @@ public class ClientThread extends Thread implements SocketDataType {
 		this.out = new ObjectOutputStream(socket.getOutputStream());
 		this.in = new ObjectInputStream(socket.getInputStream());
 		
-		System.out.printf("ip:%s 已连接\r\n", ip);
+		System.out.printf("ip:%s already connected \r\n", ip);
 	}
 
 	public void execute(String cmd) throws Exception {
@@ -52,9 +53,16 @@ public class ClientThread extends Thread implements SocketDataType {
 		this.out.writeObject(SocketData.SERVER_CMD(cmd));
 	}
 	
-	public void sendFile(File file, String path) throws Exception {
+	/**
+	 * 发送文件
+	 * @param file 文件
+	 * @param flowName 流程名称, 由客户端传来
+	 * @param path 相对于版本目录的路径
+	 * @throws Exception
+	 */
+	public void sendFile(File file, String flowName, String version) throws Exception {
 		
-		this.out.writeObject(SocketData.SERVER_FILE(file, path));
+		this.out.writeObject(SocketData.SERVER_FILE(file, flowName, version));
 	}
 	
 
@@ -92,6 +100,7 @@ public class ClientThread extends Thread implements SocketDataType {
 				_handle(socketObj);
 			} catch (Exception e) {
 				
+				e.printStackTrace();
 				this.interrupt();
 			}
 		}
@@ -101,11 +110,13 @@ public class ClientThread extends Thread implements SocketDataType {
 		
 		switch(socketObj.getType()){
 		case CLIENT_INFO:
-			System.out.println("client info:" + socketObj.getStringData());
+			//客户端身份信息
 			socketServer.add(this, socketObj.getStringData());
+			System.out.printf("client[%s] info:%s\r\n", clientInfo.getClientName(), socketObj.getStringData());
 			break;
 		case CLIENT_CMD_MSG:
-			System.out.println("client cmd msg:" + socketObj.getStringData());
+			//客户端控制台信息
+			System.out.printf("client[%s] cmd msg:%s\r\n", clientInfo.getClientName(), socketObj.getStringData());
 			msgQueue.offer(socketObj.getStringData());
 			if(msgQueue.size() > MSG_LIMIT){
 				msgQueue.poll();
@@ -113,13 +124,28 @@ public class ClientThread extends Thread implements SocketDataType {
 			break;
 		case CLIENT_CMD_HEART:
 			//收到心跳
-			System.out.println("client heart beat:" + DateUtil.getDateYMDHMS());
+			System.out.printf("client[%s] heart beat:%s\r\n", clientInfo.getClientName(), DateUtil.getDateYMDHMS());
 			this.lastHeartBeatTime = DateUtil.getDateYMDHMS();
 			break;
 		case CLIENT_REQUIRE_MD5:
-			System.out.println("client require md5 file");
-			this.sendFile(file, path);
+			//客户端请求md5文件
+			//msg1是流程,msg2是版本
+			System.out.printf("client[%s] require version[%s] md5 file\r\n", clientInfo.getClientName(), socketObj.getMsg_2());
+			//服务端目录 + 客户端类型(was-dubbo/was-web/egov-dubbo) + 客户端版本
+			String md5FilePath = _getVersionPath(socketObj.getMsg_2(), "/md5.txt");
+			this.sendFile(new File(md5FilePath), socketObj.getMsg_1(), socketObj.getMsg_2());
+			break;
+		case CLIENT_NEXT_STEP:
+			//客户端请求下一步动作
+			System.out.printf("client[%s] next step:%s\r\n", clientInfo.getClientName(), socketObj.getMsg_3());
+			socketObj.setType(SERVER_NEXT_STEP);
+			this.out.writeObject(socketObj);
+			break;
 		}
+	}
+	
+	private String _getVersionPath(String version, String filePath) {
+		return SocketServer.WorkDir + SP + clientInfo.getType() + SP + version + SP + filePath;
 	}
 
 	public String getIp() {
@@ -128,10 +154,6 @@ public class ClientThread extends Thread implements SocketDataType {
 
 	public String getLastHeartBeatTime() {
 		return lastHeartBeatTime;
-	}
-
-	public String getClientName() {
-		return clientName;
 	}
 
 	public void setClientInfo(ClientInfo clientInfo) {

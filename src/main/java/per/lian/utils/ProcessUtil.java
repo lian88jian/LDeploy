@@ -37,15 +37,12 @@ public class ProcessUtil {
 		return pid;
 	}
 
-	public static void killProcessByPid(long pid) {
-
-		if (Platform.isWindows()) {
-			execute("taskkill /pid " + pid + " -t -f");
-		} else {
-			execute("kill -9 " + pid);
-		}
+	public static void killByPort(int port) {
+		long pid = findPidByPort(port);
+		if(pid == -1) return ;
+		killByPid(pid);
 	}
-
+	
 	public static long findPidByPort(int port) {
 
 		if (Platform.isWindows()) {

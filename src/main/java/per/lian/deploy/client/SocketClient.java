@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
@@ -19,12 +21,16 @@ public class SocketClient {
 	private Socket socket;
 	private InetSocketAddress destnation;
 	private HeartBeatThread heartBeatThread;
-	private CommandThread commandThread;
+	private ProcessThread commandThread;
 	private ClientReadThread socketReadThread;
 
 	public static String ClientName;
 	public static String ClientType;
 	public static String WorkDir;
+	public static int pidPort;
+	public static String startLinux;
+	public static String startWindows;
+	public static Map<String, String> envMap = new HashMap<>();
 	
 	private static SocketClient instance = new SocketClient();
 	
@@ -48,7 +54,7 @@ public class SocketClient {
 		this.destnation = new InetSocketAddress(ip, port);
 
 		// 执行命令的线程
-		commandThread = CommandThread.getInstance();
+		commandThread = ProcessThread.getInstance();
 		commandThread.start();
 
 		// 读取数据的线程
@@ -108,7 +114,7 @@ public class SocketClient {
 			System.err.println("环境变量LDeploy未设置");
 			return ;
 		}
-		File confFile = ResourceUtils.getFile("classpath:client/" + env +"/client.properties");
+		File confFile = ResourceUtils.getFile("classpath:client/" + env +"/client.json");
 		String conf = FileUtil.readFileContent(confFile, "utf-8");
 		JSONObject confJson = JSONObject.parseObject(conf);
 
@@ -117,5 +123,12 @@ public class SocketClient {
 		ClientName = confJson.getString("client_name");
 		ClientType = confJson.getString("client_type");
 		WorkDir = confJson.getString("work_dir");
+		pidPort = confJson.getIntValue("pid_port");	//服务占用的端口,用于检查是否在运行
+		startLinux = confJson.getString("start_linux");	//linux的启动命令
+		startWindows = confJson.getString("start_windows"); //windows的启动命令
+		JSONObject envJson = confJson.getJSONObject("env");	//初始化启动环境变量配置
+		for(String key : envJson.keySet()) {
+			envMap.put(key, envJson.getString(key));
+		}
 	}
 }
