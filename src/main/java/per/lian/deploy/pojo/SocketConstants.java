@@ -40,10 +40,6 @@ public interface SocketConstants {
 	 */
 	public static final int CLIENT_REQUIRE_FILE = 104;
 	/**
-	 * 客户端请求文件
-	 */
-	public static final int CLIENT_REQUIRE_MD5 = 105;
-	/**
 	 * 客户端请求服务器发送下一步指令
 	 */
 	public static final int CLIENT_NEXT_STEP = 106;

@@ -5,8 +5,7 @@
 	"work_dir":"E:/temp/temps/client",
 	"client_type":"was-dubbo",
 	"pid_port":8080,
-	"start_linux": "java -jar was-dubbo-provider-1.0.0.jar",
-	"start_windows": "java -jar was-dubbo-provider-1.0.0.jar",
+	"start_cmd": "java -jar E:/temp/temps/client/${version}/egov-dubbo-provider-1.0.0.jar",
 	"env":{
 		"WAS":"Dev",
 		"JAVA_OPTS":"-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8"

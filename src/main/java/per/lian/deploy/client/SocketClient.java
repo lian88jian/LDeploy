@@ -28,8 +28,7 @@ public class SocketClient {
 	public static String ClientType;
 	public static String WorkDir;
 	public static int pidPort;
-	public static String startLinux;
-	public static String startWindows;
+	public static String startCmd;
 	public static Map<String, String> envMap = new HashMap<>();
 	
 	private static SocketClient instance = new SocketClient();
@@ -124,8 +123,7 @@ public class SocketClient {
 		ClientType = confJson.getString("client_type");
 		WorkDir = confJson.getString("work_dir");
 		pidPort = confJson.getIntValue("pid_port");	//服务占用的端口,用于检查是否在运行
-		startLinux = confJson.getString("start_linux");	//linux的启动命令
-		startWindows = confJson.getString("start_windows"); //windows的启动命令
+		startCmd = confJson.getString("start_cmd");	//启动命令
 		JSONObject envJson = confJson.getJSONObject("env");	//初始化启动环境变量配置
 		for(String key : envJson.keySet()) {
 			envMap.put(key, envJson.getString(key));

@@ -30,6 +30,10 @@ public class SocketData implements SocketConstants, Serializable {
 		setData(data);
 	}
 	
+	public static SocketData get(int type, String...msg) {
+		return new SocketData(type, msg);
+	}
+	
 	public SocketData(int type, String...msg) {
 		
 		setType(type);
@@ -59,12 +63,12 @@ public class SocketData implements SocketConstants, Serializable {
 		return new SocketData(CLIENT_CMD_HEART, getByte(DateUtil.getDateYMDHMS()));
 	}
 	
-	public static SocketData SERVER_FILE(File file, String flowName, String version) {
+	public static SocketData SERVER_FILE(File file, String flowName, String version, String fileName) {
 		
 		SocketData socketData = new SocketData(SERVER_FILE, FileUtil.getBytes(file));
 		socketData.setMsg_1(flowName);
 		socketData.setMsg_2(version);
-		socketData.setMsg_3(file.getName());
+		socketData.setMsg_3(fileName);
 		return socketData;
 	}
 

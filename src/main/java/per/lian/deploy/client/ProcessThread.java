@@ -36,15 +36,11 @@ public class ProcessThread extends Thread {
 		socketOut = out;
 	}
 	
-	public void startProcess() throws Exception {
+	public void startProcess(String version) throws Exception {
 		ProcessBuilder pb = new ProcessBuilder();
 		Map<String, String> env = pb.environment();
 		env.putAll(SocketClient.envMap);
-		if(Platform.isWindows()) {
-			pb.command(SocketClient.startWindows);
-		} else {
-			pb.command(SocketClient.startLinux);
-		}
+		pb.command(SocketClient.startCmd.replace("${version}", version).split(" "));
 		Process process = pb.start();
 		
 		processIn = new BufferedReader(new InputStreamReader(process.getInputStream()));

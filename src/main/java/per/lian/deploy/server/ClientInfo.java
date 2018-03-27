@@ -12,6 +12,8 @@ public class ClientInfo {
 	
 	private String clientName;
 	
+	private String ip;
+	
 	/**
 	 * 使用服务端配置文件初始化
 	 * @param clientJson
@@ -20,6 +22,7 @@ public class ClientInfo {
 		
 		setType(clientJson.getString("type"));
 		setClientName(clientJson.getString("name"));
+		setIp(clientJson.getString("ip"));
 	}
 
 	public ClientThread getClientThread() {
@@ -52,5 +55,13 @@ public class ClientInfo {
 
 	public void setClientName(String clientName) {
 		this.clientName = clientName;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 }

@@ -32,21 +32,31 @@ public class ClientReadThread extends Thread implements SocketConstants {
 		this.out = out;
 	}
 
+	/**
+	 * 接收服务器数据
+	 */
 	@Override
 	public void run() {
 
 		while (true) {
+			SocketData socketData = null;
 			try {
 
-				SocketData socketData = (SocketData) socketIn.readObject();
-				_handleServerData(socketData);
-			} catch (Exception e) {
+				socketData = (SocketData) socketIn.readObject();
 
+			} catch (Exception e) {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e1) {
-					e1.printStackTrace();
 				}
+			}
+			try {
+				if (socketData != null) {
+					_handleServerData(socketData);
+				}
+			} catch (Exception e) {
+
+				e.printStackTrace();
 			}
 		}
 	}
@@ -59,11 +69,12 @@ public class ClientReadThread extends Thread implements SocketConstants {
 
 		String _flowName;
 		String _version;
+		String _nextStep;
 
 		switch (socketData.getType()) {
 		case SERVER_CMD:
 			// 服务器要求执行cmd命令
-//			commandThread.execute(socketData.getStringData());
+			// commandThread.execute(socketData.getStringData());
 			break;
 		case SERVER_FILE:
 			// 接收到服务器文件
@@ -71,7 +82,8 @@ public class ClientReadThread extends Thread implements SocketConstants {
 			_flowName = socketData.getMsg_1();
 			_version = socketData.getMsg_2();
 			String _fileName = socketData.getMsg_3();
-			FileUtil.createFileWithBytes(SocketClient.WorkDir + _version, _fileName, socketData.getData());
+			System.out.printf("SERVER_FILE: rec file[%s] from server\r\n", _version + SP + _fileName);
+			FileUtil.createFileWithBytes(SocketClient.WorkDir + SP + _version, _fileName, socketData.getData());
 			break;
 		case SERVER_SHUTDOWN:
 			System.err.println("服务端要求关闭程序");
@@ -85,39 +97,43 @@ public class ClientReadThread extends Thread implements SocketConstants {
 				out.writeObject(new SocketData(CLIENT_ERROR, "服务端与客户端类型不一致"));
 			}
 			_version = socketData.getMsg_2();
-			// 校验客户端文件, 会自动下载文件
-			ClientFileManager.checkProjectFiles(FLOW_ONE_KEY_DEPLOY, _version);
-			
-			// 下一步, 杀死进程
-			socketData = new SocketData(CLIENT_NEXT_STEP, FLOW_ONE_KEY_DEPLOY, _version, STEP_KILL_PROCESS);
-			ClientReadThread.getInstance().sendSocketData(socketData);
-			// 下一步, 启动进程
-			socketData = new SocketData(CLIENT_NEXT_STEP, FLOW_ONE_KEY_DEPLOY, _version, STEP_START_PROCESS);
-			ClientReadThread.getInstance().sendSocketData(socketData);
+			// 请求服务器md5文件, 第二个字段, 指定当前所做的流程
+			ClientReadThread.getInstance()
+					.sendSocketData(SocketData.get(CLIENT_REQUIRE_FILE, FLOW_ONE_KEY_DEPLOY, _version, "md5.txt"));
+			//下一步校验文件列表
+			ClientReadThread.getInstance().sendSocketData(
+					SocketData.get(CLIENT_NEXT_STEP, FLOW_ONE_KEY_DEPLOY, _version, STEP_VALID_WITH_MD5_FILE));
 			break;
 		case SERVER_NEXT_STEP:
 			// 服务器发送下一步指令
 			_flowName = socketData.getMsg_1();
 			_version = socketData.getMsg_2();
-			_handleNextStep(_flowName, _version, STEP_VALID_WITH_MD5_FILE);
+			_nextStep = socketData.getMsg_3();
+			System.out.printf("SERVER_NEXT_STEP: flow[%s] version[%s] step[%s]\r\n", _flowName, _version, _nextStep);
+			_handleNextStep(_flowName, _version, _nextStep);
+			break;
 		}
 	}
 
 	private void _handleNextStep(String flowName, String version, String nextStep) throws Exception {
 
 		switch (flowName) {
+		// 一键部署
 		case FLOW_ONE_KEY_DEPLOY:
-			// 一键部署
 			switch (nextStep) {
+			// 校验md5文件列表
 			case STEP_VALID_WITH_MD5_FILE:
-				// 校验md5文件列表
-				ClientFileManager.checkProjectFiles(flowName, version);
+				ClientFileManager.validWithMd5File(flowName, version);
 				break;
+			// 下一步, 杀死进程
 			case STEP_KILL_PROCESS:
 				ProcessUtil.killByPort(SocketClient.pidPort);
+				ClientReadThread.getInstance().sendSocketData(
+						SocketData.get(CLIENT_NEXT_STEP, FLOW_ONE_KEY_DEPLOY, version, STEP_START_PROCESS));
 				break;
+			// 下一步, 启动进程
 			case STEP_START_PROCESS:
-				commandThread.startProcess();
+				commandThread.startProcess(version);
 				break;
 			}
 			break;

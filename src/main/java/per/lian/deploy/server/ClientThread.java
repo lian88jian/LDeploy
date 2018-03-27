@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.apache.log4j.Logger;
 
 import per.lian.deploy.pojo.SocketConstants;
 import per.lian.deploy.pojo.SocketData;
@@ -23,6 +24,7 @@ import per.lian.utils.IOUtil;
 public class ClientThread extends Thread implements SocketConstants {
 	
 	private final static int MSG_LIMIT = 3000;
+	private static Logger logger = Logger.getLogger(ClientThread.class);
 	
 	private Socket socket;
 	private SocketServer socketServer;
@@ -37,15 +39,21 @@ public class ClientThread extends Thread implements SocketConstants {
 	private ClientInfo clientInfo;
 
 
-	public ClientThread(SocketServer socketServer, Socket socket) throws Exception {
+	public ClientThread(SocketServer socketServer, Socket socket) {
 		
-		this.socketServer = socketServer;
-		this.socket = socket;
-		this.ip = socket.getInetAddress().getHostAddress();
-		this.out = new ObjectOutputStream(socket.getOutputStream());
-		this.in = new ObjectInputStream(socket.getInputStream());
-		
-		System.out.printf("ip:%s already connected \r\n", ip);
+		try {
+			
+			this.socketServer = socketServer;
+			this.socket = socket;
+			this.ip = socket.getInetAddress().getHostAddress();
+			this.out = new ObjectOutputStream(socket.getOutputStream());
+			this.in = new ObjectInputStream(socket.getInputStream());
+			
+			logger.info("ip:" + ip + " already connected");
+		} catch(Exception e) {
+			
+			logger.error("ip:" + ip + " client connect error", e);
+		}
 	}
 
 	public void execute(String cmd) throws Exception {
@@ -57,12 +65,13 @@ public class ClientThread extends Thread implements SocketConstants {
 	 * 发送文件
 	 * @param file 文件
 	 * @param flowName 流程名称, 由客户端传来
+	 * @param fileName 
 	 * @param path 相对于版本目录的路径
 	 * @throws Exception
 	 */
-	public void sendFile(File file, String flowName, String version) throws Exception {
+	public void sendFile(File file, String flowName, String version, String fileName) throws Exception {
 		
-		this.out.writeObject(SocketData.SERVER_FILE(file, flowName, version));
+		this.out.writeObject(SocketData.SERVER_FILE(file, flowName, version, fileName));
 	}
 	
 
@@ -78,7 +87,6 @@ public class ClientThread extends Thread implements SocketConstants {
 	 */
 	public void oneKeyDeploy(String version) throws Exception{
 		
-		ServerFileManager.generaterMd5File(clientInfo.getType(), version);
 		this.out.writeObject(new SocketData(SERVER_ONEKEY_DEPLOY, clientInfo.getType(), version));
 	}
 	
@@ -114,9 +122,12 @@ public class ClientThread extends Thread implements SocketConstants {
 			socketServer.add(this, socketObj.getStringData());
 			System.out.printf("client[%s] info:%s\r\n", clientInfo.getClientName(), socketObj.getStringData());
 			break;
+		case CLIENT_ERROR:
+			System.out.printf("client[%s] error msg:%s\r\n", clientInfo.getClientName(), socketObj.getMsg_1());
+			break;
 		case CLIENT_CMD_MSG:
 			//客户端控制台信息
-			System.out.printf("client[%s] cmd msg:%s\r\n", clientInfo.getClientName(), socketObj.getStringData());
+			System.out.printf("client[%s] console:%s\r\n", clientInfo.getClientName(), socketObj.getStringData());
 			msgQueue.offer(socketObj.getStringData());
 			if(msgQueue.size() > MSG_LIMIT){
 				msgQueue.poll();
@@ -124,16 +135,22 @@ public class ClientThread extends Thread implements SocketConstants {
 			break;
 		case CLIENT_CMD_HEART:
 			//收到心跳
-			System.out.printf("client[%s] heart beat:%s\r\n", clientInfo.getClientName(), DateUtil.getDateYMDHMS());
+//			System.out.printf("client[%s] heart beat:%s\r\n", clientInfo.getClientName(), DateUtil.getDateYMDHMS());
 			this.lastHeartBeatTime = DateUtil.getDateYMDHMS();
 			break;
-		case CLIENT_REQUIRE_MD5:
+		case CLIENT_REQUIRE_FILE:
 			//客户端请求md5文件
-			//msg1是流程,msg2是版本
-			System.out.printf("client[%s] require version[%s] md5 file\r\n", clientInfo.getClientName(), socketObj.getMsg_2());
+			//msg1是流程,msg2是版本,msg3是文件名
+			String flow = socketObj.getMsg_1();
+			String version = socketObj.getMsg_2();
+			String fileName = socketObj.getMsg_3();
+			System.out.printf("client[%s] require version[%s] file[%s]\r\n", clientInfo.getClientName(), socketObj.getMsg_2(), socketObj.getMsg_3());
 			//服务端目录 + 客户端类型(was-dubbo/was-web/egov-dubbo) + 客户端版本
-			String md5FilePath = _getVersionPath(socketObj.getMsg_2(), "/md5.txt");
-			this.sendFile(new File(md5FilePath), socketObj.getMsg_1(), socketObj.getMsg_2());
+			if("md5.txt".equals(fileName)) {
+				ServerFileManager.generaterMd5File(clientInfo.getType(), version);
+			}
+			String filePath = _getVersionPath(version, fileName);
+			this.sendFile(new File(filePath), flow, version, fileName);
 			break;
 		case CLIENT_NEXT_STEP:
 			//客户端请求下一步动作
