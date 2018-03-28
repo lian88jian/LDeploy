@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 import per.lian.deploy.client.SocketClient;
 import per.lian.utils.DateUtil;
 import per.lian.utils.FileUtil;
+import per.lian.utils.ProcessUtil;
 
 public class SocketData implements SocketConstants, Serializable {
 	
@@ -60,7 +61,8 @@ public class SocketData implements SocketConstants, Serializable {
 	}
 	
 	public static SocketData CLIENT_CMD_HEART(){
-		return new SocketData(CLIENT_CMD_HEART, getByte(DateUtil.getDateYMDHMS()));
+		String projectRuning = ProcessUtil.findPidByPort(SocketClient.pidPort) != -1 ? "true" : "false";
+		return new SocketData(CLIENT_CMD_HEART, projectRuning);
 	}
 	
 	public static SocketData SERVER_FILE(File file, String flowName, String version, String fileName) {

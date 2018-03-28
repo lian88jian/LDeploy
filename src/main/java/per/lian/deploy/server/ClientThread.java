@@ -37,6 +37,7 @@ public class ClientThread extends Thread implements SocketConstants {
 	private String lastHeartBeatTime = null;
 	
 	private ClientInfo clientInfo;
+	private boolean projectRuning;
 
 
 	public ClientThread(SocketServer socketServer, Socket socket) {
@@ -137,6 +138,7 @@ public class ClientThread extends Thread implements SocketConstants {
 			//收到心跳
 //			System.out.printf("client[%s] heart beat:%s\r\n", clientInfo.getClientName(), DateUtil.getDateYMDHMS());
 			this.lastHeartBeatTime = DateUtil.getDateYMDHMS();
+			this.setProjectRuning(Boolean.getBoolean(socketObj.getMsg_1()));
 			break;
 		case CLIENT_REQUIRE_FILE:
 			//客户端请求md5文件
@@ -175,6 +177,14 @@ public class ClientThread extends Thread implements SocketConstants {
 
 	public void setClientInfo(ClientInfo clientInfo) {
 		this.clientInfo = clientInfo;
+	}
+
+	public boolean isProjectRuning() {
+		return projectRuning;
+	}
+
+	public void setProjectRuning(boolean projectRuning) {
+		this.projectRuning = projectRuning;
 	}
 	
 }

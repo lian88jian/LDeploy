@@ -93,7 +93,7 @@ public class SocketServer extends Thread {
 		System.out.printf("client [%s] connected, os:%s, ip:%s", remoteName, clientInfo.getOs(), clientThread.getIp());
 
 		// add test command code here
-		clientThread.oneKeyDeploy("20180324");
+//		clientThread.oneKeyDeploy("20180324");
 	}
 	
 	public Collection<ClientInfo> getClientList() {

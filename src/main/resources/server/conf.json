@@ -6,6 +6,11 @@
 			"name": "WasDubbo_131",
 			"ip": "127.0.0.1",
 			"type": "was-dubbo"
+		},
+		{
+			"name": "WasWeb_132",
+			"ip": "127.0.0.1",
+			"type": "was-web"
 		}
 	]
 }
