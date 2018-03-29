@@ -97,6 +97,7 @@ public class ClientReadThread extends Thread implements SocketConstants {
 				out.writeObject(new SocketData(CLIENT_ERROR, "服务端与客户端类型不一致"));
 			}
 			_version = socketData.getMsg_2();
+			SocketClient.projectVersion = _version;
 			// 请求服务器md5文件, 第二个字段, 指定当前所做的流程
 			ClientReadThread.getInstance()
 					.sendSocketData(SocketData.get(CLIENT_REQUIRE_FILE, FLOW_ONE_KEY_DEPLOY, _version, "md5.txt"));

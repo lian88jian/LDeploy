@@ -4,7 +4,7 @@
 	"client_name":"WasDubbo_131",
 	"work_dir":"E:/temp/temps/client",
 	"client_type":"was-dubbo",
-	"pid_port":8080,
+	"pid_port":20881,
 	"start_cmd": "java -jar E:/temp/temps/client/${version}/egov-dubbo-provider-1.0.0.jar",
 	"env":{
 		"WAS":"Dev",

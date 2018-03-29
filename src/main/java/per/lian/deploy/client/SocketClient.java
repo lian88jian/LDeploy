@@ -31,6 +31,8 @@ public class SocketClient {
 	public static String startCmd;
 	public static Map<String, String> envMap = new HashMap<>();
 	
+	public static String projectVersion;
+	
 	private static SocketClient instance = new SocketClient();
 	
 	public static SocketClient getInstance() {

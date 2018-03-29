@@ -62,7 +62,7 @@ public class SocketData implements SocketConstants, Serializable {
 	
 	public static SocketData CLIENT_CMD_HEART(){
 		String projectRuning = ProcessUtil.findPidByPort(SocketClient.pidPort) != -1 ? "true" : "false";
-		return new SocketData(CLIENT_CMD_HEART, projectRuning);
+		return new SocketData(CLIENT_CMD_HEART, projectRuning, SocketClient.projectVersion);
 	}
 	
 	public static SocketData SERVER_FILE(File file, String flowName, String version, String fileName) {

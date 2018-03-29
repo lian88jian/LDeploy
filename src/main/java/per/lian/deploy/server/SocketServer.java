@@ -1,10 +1,12 @@
 package per.lian.deploy.server;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileFilter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import per.lian.deploy.pojo.SocketConstants;
 import per.lian.utils.FileUtil;
 import per.lian.utils.ResourceUtil;
 
@@ -100,6 +103,21 @@ public class SocketServer extends Thread {
 		return clientMap.values();
 	}
 	
+	public ClientInfo getClientByName(String clientName) {
+		return clientMap.get(clientName);
+	}
+	
+	public static List<String> getVersionList(String projectType) {
+		
+		File projectDir = new File(WorkDir + SocketConstants.SP + projectType);
+		List<String> vL = new ArrayList<>();
+		List<File> fileList = FileUtil.getDirs(projectDir);
+		for(File _f : fileList) {
+			vL.add(_f.getName());
+		}
+		return vL;
+	}
+	
 	@Override
 	public void run() {
 		try {
@@ -134,5 +152,6 @@ public class SocketServer extends Thread {
 		new SocketServer().start(); // 启动
 
 	}
+
 
 }

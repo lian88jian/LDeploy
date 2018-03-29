@@ -66,4 +66,5 @@ public interface SocketConstants {
 	 * 服务器发送下一步指令
 	 */
 	public static final int SERVER_NEXT_STEP = 204;
+	
 }
