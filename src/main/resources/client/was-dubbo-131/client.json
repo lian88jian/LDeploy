@@ -2,9 +2,10 @@
 	"server_id":"127.0.0.1",
 	"server_port":8888,
 	"client_name":"WasDubbo_131",
-	"work_dir":"E:/temp/temps/client",
+	"work_dir":"E:/temp/temps/jar_client",
 	"client_type":"was-dubbo",
 	"pid_port":20881,
+	"start_type": "jar",
 	"start_cmd": "java -jar E:/temp/temps/client/${version}/egov-dubbo-provider-1.0.0.jar",
 	"env":{
 		"WAS":"Dev",

@@ -28,7 +28,9 @@ public class SocketClient {
 	public static String ClientType;
 	public static String WorkDir;
 	public static int pidPort;
+	public static String startType;
 	public static String startCmd;
+	public static String tomcatDir;
 	public static Map<String, String> envMap = new HashMap<>();
 	
 	public static String projectVersion;
@@ -126,6 +128,8 @@ public class SocketClient {
 		WorkDir = confJson.getString("work_dir");
 		pidPort = confJson.getIntValue("pid_port");	//服务占用的端口,用于检查是否在运行
 		startCmd = confJson.getString("start_cmd");	//启动命令
+		startType = confJson.getString("start_type");
+		tomcatDir = confJson.getString("tomcat_dir");
 		JSONObject envJson = confJson.getJSONObject("env");	//初始化启动环境变量配置
 		for(String key : envJson.keySet()) {
 			envMap.put(key, envJson.getString(key));
