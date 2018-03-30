@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,8 +20,9 @@ public class ProcessThread extends Thread {
 
 	private static ProcessThread instance;
 	private BufferedReader processIn;
-	private PrintWriter processOut;
+//	private PrintWriter processOut;
 	private ObjectOutputStream socketOut;
+	private Process process;
 
 	public static ProcessThread getInstance() {
 
@@ -47,12 +49,18 @@ public class ProcessThread extends Thread {
 			SocketClient.envMap.put("CATALINA_HOME", "E:/software/servers/apache-tomcat-7.0.69");
 		}
 		
-		ProcessBuilder pb = new ProcessBuilder();
-		Map<String, String> env = pb.environment();
-		env.putAll(SocketClient.envMap);
-		pb.command(SocketClient.startCmd.replace("${version}", version).split(" "));
-		Process process = pb.start();
-//		
+		if(process == null || !process.isAlive()) {
+			
+			ProcessBuilder pb = new ProcessBuilder();
+			Map<String, String> env = pb.environment();
+			env.putAll(SocketClient.envMap);
+			pb.inheritIO().command(SocketClient.startCmd.replace("${version}", version).split(" "));
+			pb.redirectErrorStream(true).redirectError(Redirect.PIPE).redirectInput(Redirect.PIPE).redirectOutput(Redirect.PIPE);
+			process = pb.start();
+			processIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//			processOut = new PrintWriter(process.getOutputStream());
+		}
+		
 //		ProcessBuilder pb = new ProcessBuilder();
 //		pb.inheritIO().environment().put("JAVA_OPTS", "-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8");
 //		pb.environment().put("CATALINA_HOME", "E:/software/servers/apache-tomcat-7.0.69");
@@ -60,8 +68,6 @@ public class ProcessThread extends Thread {
 //		pb.command("E:\\software\\servers\\apache-tomcat-7.0.69\\bin\\catalina.bat", "run");
 //		Process process = pb.start();
 		
-		processIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		processOut = new PrintWriter(process.getOutputStream());
 	}
 	
 	private void _modifyTomcatConf(String version) throws IOException {
@@ -88,7 +94,7 @@ public class ProcessThread extends Thread {
 				
 				String cmdMsg = processIn.readLine();
 				if(StringUtils.isNotEmpty(cmdMsg)){
-					
+					System.out.println(cmdMsg);
 					socketOut.writeObject(SocketData.CLIENT_CMD_MSG(cmdMsg));
 				}
 			} catch (Exception e) {

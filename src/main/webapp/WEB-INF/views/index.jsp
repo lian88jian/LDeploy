@@ -48,7 +48,7 @@
 						</button>
 						<ul class="dropdown-menu" role="menu">
 							<li><a href="#" data-bind="click: chooseVersion">一键部署</a></li>
-							<li><a href="#" data-bind="click: chooseVersion, visible: state() == '运行中'">停止</a></li>
+							<li><a href="#" data-bind="click: stopProject, visible: state() == '运行中'">停止</a></li>
 						</ul>
 					</div>
 				</td>
@@ -120,7 +120,17 @@
 							alert("get version list error");
 						}
 					});
-				}
+				};
+				//停止项目
+				this.stopProject = function(){
+					$.getJSON("/LDeploy/" + _self.clientName() + "/stop", function(res){
+						if(res.success){
+							alert('command send success');
+						}else{
+							alert(res.msg);
+						}
+					});
+				};
 			}
 			var ViewModel = function(){
 				
@@ -147,8 +157,9 @@
 						clientName: this.currentClientName,
 						version: $('#versionSel').val()
 					},function(res){
+						$('#versionModal').modal('hide');
 						if(res.success){
-							alert('success');
+							alert('command send success');
 						}else{
 							alert(res.msg);
 						}

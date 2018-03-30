@@ -89,6 +89,9 @@ public class ClientReadThread extends Thread implements SocketConstants {
 			System.err.println("服务端要求关闭程序");
 			SocketClient.getInstance().shutdown();
 			break;
+		case SERVER_PROJECT_STOP:
+			ProcessUtil.killByPort(SocketClient.pidPort);
+			break;
 		case SERVER_ONEKEY_DEPLOY:
 			// 服务器发送一键部署指令
 			String clientType = socketData.getMsg_1();

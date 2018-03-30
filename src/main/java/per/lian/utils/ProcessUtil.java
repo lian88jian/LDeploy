@@ -55,7 +55,14 @@ public class ProcessUtil {
 			String[] ss = result.replaceAll("[\\s]+", " ").split(" ");
 			return Long.parseLong(ss[ss.length - 1]);
 		} else {
-			throw new RuntimeException("unspported platform for method ProcessUtil.findPidByPort");
+			// netstat -anp | grep " 0.0.0.0:80 "
+			// tcp        0      0 0.0.0.0:80                  0.0.0.0:*                   LISTEN      16970/java
+			String result = execute("netstat -anp | grep \" 0.0.0.0:" + port + " \" | grep \"LISTEN\"");
+			if (StringUtils.isEmpty(result)) {
+				return -1;
+			}
+			String[] ss = result.replaceAll("[\\s]+", " ").split(" ");
+			return Long.parseLong(ss[ss.length - 2]);
 		}
 	}
 

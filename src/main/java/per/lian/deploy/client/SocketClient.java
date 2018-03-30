@@ -117,7 +117,7 @@ public class SocketClient {
 			System.err.println("环境变量LDeploy未设置");
 			return ;
 		}
-		File confFile = ResourceUtils.getFile("classpath:client/" + env +"/client.json");
+		File confFile = ResourceUtils.getFile("classpath:client/" + env +".json");
 		String conf = FileUtil.readFileContent(confFile, "utf-8");
 		JSONObject confJson = JSONObject.parseObject(conf);
 

@@ -41,6 +41,22 @@ public class IndexController {
 	}
 	
 	@ResponseBody
+	@RequestMapping("{clientName}/stop")
+	public BaseResult stop(@PathVariable("clientName")String clientName) {
+		
+		ClientInfo clientInfo = SocketServer.getInstance().getClientByName(clientName);
+		if(clientInfo.getClientThread() == null || !clientInfo.getClientThread().isAlive()) {
+			return BaseResult.getFailWithMsg("socket client not online");
+		}
+		try {
+			clientInfo.getClientThread().sendStopProject();
+		} catch (Exception e) {
+			BaseResult.getFailWithMsg(e);
+		}
+		return BaseResult.getSuccess();
+	}
+	
+	@ResponseBody
 	@RequestMapping("oneKeyDeploy")
 	public BaseResult oneKeyDeploy(String clientName, String version) {
 		

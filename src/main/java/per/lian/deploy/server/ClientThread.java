@@ -83,6 +83,11 @@ public class ClientThread extends Thread implements SocketConstants {
 
 		this.out.writeObject(SocketData.SERVER_SHUTDOWN());
 	}
+	
+	public void sendStopProject() throws Exception {
+
+		this.out.writeObject(SocketData.get(SERVER_PROJECT_STOP));
+	}
 
 	/**
 	 * 一键部署
@@ -131,7 +136,7 @@ public class ClientThread extends Thread implements SocketConstants {
 			break;
 		case CLIENT_CMD_MSG:
 			// 客户端控制台信息
-			System.out.printf("client[%s] console:%s\r\n", clientInfo.getClientName(), socketObj.getStringData());
+//			System.out.printf("client[%s] console:%s\r\n", clientInfo.getClientName(), socketObj.getStringData());
 			msgQueue.offer(socketObj.getStringData());
 			if (msgQueue.size() > MSG_LIMIT) {
 				msgQueue.poll();
