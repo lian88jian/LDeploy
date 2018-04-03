@@ -89,6 +89,9 @@ public class ClientReadThread extends Thread implements SocketConstants {
 			System.err.println("服务端要求关闭程序");
 			SocketClient.getInstance().shutdown();
 			break;
+		case SERVER_PROJECT_STOP:
+			ProcessUtil.killByPort(SocketClient.pidPort);
+			break;
 		case SERVER_ONEKEY_DEPLOY:
 			// 服务器发送一键部署指令
 			String clientType = socketData.getMsg_1();
@@ -97,6 +100,7 @@ public class ClientReadThread extends Thread implements SocketConstants {
 				out.writeObject(new SocketData(CLIENT_ERROR, "服务端与客户端类型不一致"));
 			}
 			_version = socketData.getMsg_2();
+			SocketClient.projectVersion = _version;
 			// 请求服务器md5文件, 第二个字段, 指定当前所做的流程
 			ClientReadThread.getInstance()
 					.sendSocketData(SocketData.get(CLIENT_REQUIRE_FILE, FLOW_ONE_KEY_DEPLOY, _version, "md5.txt"));

@@ -1,0 +1,14 @@
+{
+	"server_ip":"10.36.161.130",
+	"server_port":10088,
+	"client_name":"WasDubbo_161",
+	"work_dir":"/root/soft/was-dubbo",
+	"client_type":"was-dubbo",
+	"pid_port":20882,
+	"start_type": "jar",
+	"start_cmd": "java -jar /root/soft/was-dubbo/${version}/was-dubbo-provider-1.0.0.jar",
+	"env":{
+		"WAS":"Pro_10.36.161.161",
+		"JAVA_OPTS":"-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8"
+	}
+}

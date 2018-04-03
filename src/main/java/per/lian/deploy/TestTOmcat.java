@@ -12,16 +12,14 @@ public class TestTOmcat {
 	//https://blog.csdn.net/tiantang_1986/article/details/51306536
 	public static void main(String[] args) throws Exception {
 		
-//		File file = new File("F:\\program\\java\\j2ee\\tomcat\\apache-tomcat-7.0.70\\bin");
-//		System.out.println(file.exists());
+		ProcessBuilder pb = new ProcessBuilder();
+		pb.inheritIO().environment().put("JAVA_OPTS", "-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8");
+		pb.environment().put("CATALINA_HOME", "E:/software/servers/apache-tomcat-7.0.69");
+		
+		pb.command("E:\\software\\servers\\apache-tomcat-7.0.69\\bin\\catalina.bat", "run");
+		Process process = pb.start();
 //		
-//		ProcessBuilder pb = new ProcessBuilder();
-//		pb.directory(file).inheritIO().environment().put("JAVA_OPTS", "-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8");
-//		
-//		pb.command("F:\\program\\java\\j2ee\\tomcat\\apache-tomcat-7.0.70\\bin\\catalina.bat", "run");
-//		Process process = pb.start();
-//		
-//		Thread.sleep(15000);
+		Thread.sleep(550000);
 		
 //		long pid = ProcessUtil.getPid(process);
 //		System.out.println(pid);
@@ -29,10 +27,10 @@ public class TestTOmcat {
 //		System.out.println(process.exitValue());
 //		process.destroy();
 		
-		ProcessBuilder pb = new ProcessBuilder();
-		Map<String, String> env = pb.environment();
-		pb.inheritIO();
-		pb.command("java", "-version");
-		Process process = pb.start();
+//		ProcessBuilder pb = new ProcessBuilder();
+//		Map<String, String> env = pb.environment();
+//		pb.inheritIO();
+//		pb.command("java", "-version");
+//		Process process = pb.start();
 	}
 }

@@ -3,6 +3,7 @@ package per.lian.utils;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -123,13 +125,15 @@ public class FileUtil {
 	public static File createFileWithBytes(String filePath, String fileName, byte[] buff) {
 		BufferedOutputStream bos = null;
 		FileOutputStream fos = null;
-		File file = new File(filePath + "\\" + fileName);
+		filePath = filePath.replaceAll("\\\\", "/");
+		fileName = fileName.replaceAll("\\\\", "/");
+		File file = new File(filePath + "/" + fileName);
 		try {
 			File dir = file.getParentFile();
 			if (!dir.exists() || !dir.isDirectory()) {// 判断文件目录是否存在
 				dir.mkdirs();
 			}
-			file = new File(filePath + "\\" + fileName);
+			file = new File(filePath + "/" + fileName);
 			fos = new FileOutputStream(file);
 			bos = new BufferedOutputStream(fos);
 			bos.write(buff);
@@ -268,6 +272,20 @@ public class FileUtil {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static List<File> getDirs(File projectDir) {
+		if(!projectDir.exists()) {
+			return new ArrayList<File>();
+		}
+		File[] files = projectDir.listFiles(new FileFilter() {
+			
+			@Override
+			public boolean accept(File _file) {
+				return _file.isDirectory();
+			}
+		});
+		return Arrays.asList(files);
 	}
 
 }

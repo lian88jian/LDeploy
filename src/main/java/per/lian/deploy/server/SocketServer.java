@@ -1,10 +1,12 @@
 package per.lian.deploy.server;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileFilter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import per.lian.deploy.pojo.SocketConstants;
 import per.lian.utils.FileUtil;
 import per.lian.utils.ResourceUtil;
 
@@ -93,11 +96,26 @@ public class SocketServer extends Thread {
 		System.out.printf("client [%s] connected, os:%s, ip:%s", remoteName, clientInfo.getOs(), clientThread.getIp());
 
 		// add test command code here
-		clientThread.oneKeyDeploy("20180324");
+//		clientThread.oneKeyDeploy("20180324");
 	}
 	
 	public Collection<ClientInfo> getClientList() {
 		return clientMap.values();
+	}
+	
+	public ClientInfo getClientByName(String clientName) {
+		return clientMap.get(clientName);
+	}
+	
+	public static List<String> getVersionList(String projectType) {
+		
+		File projectDir = new File(WorkDir + SocketConstants.SP + projectType);
+		List<String> vL = new ArrayList<>();
+		List<File> fileList = FileUtil.getDirs(projectDir);
+		for(File _f : fileList) {
+			vL.add(_f.getName());
+		}
+		return vL;
 	}
 	
 	@Override
@@ -122,7 +140,7 @@ public class SocketServer extends Thread {
 	public static void main(String[] args) throws Exception {
 
 		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resource = resolver.getResource("server\\log4j.properties");
+		Resource resource = resolver.getResource("server/log4j.properties");
 		PropertyConfigurator.configure(resource.getInputStream());
 
 		File confFile = ResourceUtils.getFile("classpath:server/server.json");
@@ -134,5 +152,6 @@ public class SocketServer extends Thread {
 		new SocketServer().start(); // 启动
 
 	}
+
 
 }

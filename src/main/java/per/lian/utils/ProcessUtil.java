@@ -55,7 +55,14 @@ public class ProcessUtil {
 			String[] ss = result.replaceAll("[\\s]+", " ").split(" ");
 			return Long.parseLong(ss[ss.length - 1]);
 		} else {
-			throw new RuntimeException("unspported platform for method ProcessUtil.findPidByPort");
+			// netstat -anp | grep " 0.0.0.0:80 "
+			// tcp        0      0 0.0.0.0:80                  0.0.0.0:*                   LISTEN      16970/java
+			String result = execute("netstat -anp | grep \" 0.0.0.0:" + port + " \" | grep \"LISTEN\"");
+			if (StringUtils.isEmpty(result)) {
+				return -1;
+			}
+			String[] ss = result.replaceAll("[\\s]+", " ").split(" ");
+			return Long.parseLong(ss[ss.length - 1].replace("/java", ""));
 		}
 	}
 
@@ -77,13 +84,18 @@ public class ProcessUtil {
 		long pid = findPidByPort(8080);
 		killByPid(pid);
 	}
-
+	
 	public static String execute(String cmd) {
 
 		Runtime runtime = Runtime.getRuntime();
 		StringBuffer buff = new StringBuffer();
 		try {
-			Process process = runtime.exec(cmd);
+			Process process = null;
+			if (Platform.isWindows()) {
+				process = runtime.exec(cmd);
+			} else {
+				process = runtime.exec(new String[] {"/bin/sh","-c", cmd});
+			}
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String result = null;
 
