@@ -1,5 +1,6 @@
 package per.lian.deploy.client;
 
+import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -35,10 +36,17 @@ public class HeartBeatThread extends Thread {
 			
 			try {
 				
-				socketOut.writeObject(SocketData.CLIENT_CMD_HEART());
+				if(socketOut == null) {
+					socketClient.connect();
+				} else {
+					socketOut.writeObject(SocketData.CLIENT_CMD_HEART());
+				}
+			} catch (IOException e) {
+				//这样说明断开连接了
+				socketClient.connect();
 			} catch (Exception e) {
 				
-				socketClient.connect();
+				e.printStackTrace();
 			}
 			try {
 				Thread.sleep(delay);

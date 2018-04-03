@@ -18,7 +18,7 @@ public class ServerFileManager {
 	 */
 	public static void generaterMd5File(String serverType, String serverVersion) throws Exception {
 
-		String serverDirPath = SocketServer.WorkDir + "\\" + serverType + "\\" + serverVersion + "\\";
+		String serverDirPath = SocketServer.WorkDir + "/" + serverType + "/" + serverVersion + "/";
 		File md5File = new File(serverDirPath + "md5.txt");
 		if (md5File.exists()) {
 			return;

@@ -62,7 +62,7 @@ public class ProcessUtil {
 				return -1;
 			}
 			String[] ss = result.replaceAll("[\\s]+", " ").split(" ");
-			return Long.parseLong(ss[ss.length - 2]);
+			return Long.parseLong(ss[ss.length - 1].replace("/java", ""));
 		}
 	}
 
@@ -84,13 +84,18 @@ public class ProcessUtil {
 		long pid = findPidByPort(8080);
 		killByPid(pid);
 	}
-
+	
 	public static String execute(String cmd) {
 
 		Runtime runtime = Runtime.getRuntime();
 		StringBuffer buff = new StringBuffer();
 		try {
-			Process process = runtime.exec(cmd);
+			Process process = null;
+			if (Platform.isWindows()) {
+				process = runtime.exec(cmd);
+			} else {
+				process = runtime.exec(new String[] {"/bin/sh","-c", cmd});
+			}
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String result = null;
 

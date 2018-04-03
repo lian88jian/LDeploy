@@ -140,7 +140,7 @@ public class SocketServer extends Thread {
 	public static void main(String[] args) throws Exception {
 
 		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resource = resolver.getResource("server\\log4j.properties");
+		Resource resource = resolver.getResource("server/log4j.properties");
 		PropertyConfigurator.configure(resource.getInputStream());
 
 		File confFile = ResourceUtils.getFile("classpath:server/server.json");

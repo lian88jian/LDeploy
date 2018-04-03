@@ -1,0 +1,15 @@
+{
+	"server_id":"10.36.161.130",
+	"server_port":10088,
+	"client_name":"WasWeb_131",
+	"work_dir":"E:/webapp/was-web",
+	"client_type":"was-web",
+	"pid_port":80,
+	"start_type": "tomcat",
+	"start_cmd": "E:/apache-tomcat-7.0.72/bin/catalina.bat run",
+	"tomcat_dir": "E:/apache-tomcat-7.0.72",
+	"env":{
+		"WAS":"Pro_10.36.161.131",
+		"JAVA_OPTS":"-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8",
+	}
+}

@@ -119,6 +119,7 @@ public class ClientThread extends Thread implements SocketConstants {
 			} catch (Exception e) {
 
 				e.printStackTrace();
+				this.destroy();
 				this.interrupt();
 			}
 		}

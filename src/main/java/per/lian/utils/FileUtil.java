@@ -125,13 +125,15 @@ public class FileUtil {
 	public static File createFileWithBytes(String filePath, String fileName, byte[] buff) {
 		BufferedOutputStream bos = null;
 		FileOutputStream fos = null;
-		File file = new File(filePath + "\\" + fileName);
+		filePath = filePath.replaceAll("\\\\", "/");
+		fileName = fileName.replaceAll("\\\\", "/");
+		File file = new File(filePath + "/" + fileName);
 		try {
 			File dir = file.getParentFile();
 			if (!dir.exists() || !dir.isDirectory()) {// 判断文件目录是否存在
 				dir.mkdirs();
 			}
-			file = new File(filePath + "\\" + fileName);
+			file = new File(filePath + "/" + fileName);
 			fos = new FileOutputStream(file);
 			bos = new BufferedOutputStream(fos);
 			bos.write(buff);
